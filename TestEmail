@@ -1,0 +1,36 @@
+trigger TestEmail on Events__c (after insert) {
+     for(Events__c e : trigger.new) {            
+            // grab the email template
+            EmailTemplate emailTemplate = [select Id, Subject, HtmlValue, Body from EmailTemplate where Id = '00X0o000001CNxP'];
+        
+            // grab the contact fields we need. This assumes we are emailing a contact.
+            Contact c = [Select Id, FirstName, LastName, Email, Savings_Total__c, Discount_Product__c, Discount_Battery__c FROM Contact WHERE Id=: e.Contact__c];
+        
+            // process the merge fields
+            String subject = emailTemplate.Subject;
+            //subject = subject.replace('{!Contact.FirstName}', c.FirstName);
+        
+            String htmlBody = emailTemplate.HtmlValue;
+            htmlBody = htmlBody.replace('{!Contact.LastName}', c.LastName);
+            htmlBody = htmlBody.replace('{!Contact.Discount_Product__c}', String.valueOf(c.Discount_Product__c));
+            htmlBody = htmlBody.replace('{!Contact.Discount_Battery__c}', String.valueOf(c.Discount_Battery__c));
+            htmlBody = htmlBody.replace('{!Contact.Savings_Total__c}', String.valueOf(c.Savings_Total__c));
+        
+            String plainBody = emailTemplate.Body;
+            plainBody = plainBody.replace('{!Contact.LastName}', c.LastName);
+        
+            //build the email message
+            Messaging.Singleemailmessage email = new Messaging.Singleemailmessage();
+        
+            //email.setReplyTo(fromaddress);
+            //email.setSenderDisplayName(fromaddress);
+            email.setTargetObjectId(c.Id);
+            //email.setSaveAsActivity(true);
+        
+            email.setSubject(subject);
+            email.setHtmlBody(htmlBody);
+            email.setPlainTextBody(plainBody);
+        
+            Messaging.sendEmail(new Messaging.SingleEmailmessage[] {email});
+     }
+}
