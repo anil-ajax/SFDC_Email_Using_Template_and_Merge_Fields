@@ -11,10 +11,7 @@ trigger TestEmail on Events__c (after insert) {
             //subject = subject.replace('{!Contact.FirstName}', c.FirstName);
         
             String htmlBody = emailTemplate.HtmlValue;
-            htmlBody = htmlBody.replace('{!Contact.LastName}', c.LastName);
-            htmlBody = htmlBody.replace('{!Contact.Discount_Product__c}', String.valueOf(c.Discount_Product__c));
-            htmlBody = htmlBody.replace('{!Contact.Discount_Battery__c}', String.valueOf(c.Discount_Battery__c));
-            htmlBody = htmlBody.replace('{!Contact.Savings_Total__c}', String.valueOf(c.Savings_Total__c));
+            htmlBody = htmlBody.replace('{!Contact.LastName}', c.LastName); // use String.valueOf(c.LastName) if you face type error
         
             String plainBody = emailTemplate.Body;
             plainBody = plainBody.replace('{!Contact.LastName}', c.LastName);
